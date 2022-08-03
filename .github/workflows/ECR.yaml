@@ -25,8 +25,9 @@ jobs:
       env:
         REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
         REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-        IMAGE_TAG: ${{ github.sha }}
+        REGISTRY_ALIAS: ${{ secrets.REGISTRY_ALIAS }}
+        IMAGE_TAG: latest
       run: |
         docker build -t $REPOSITORY:$IMAGE_TAG .
-        docker tag $REPOSITORY:$IMAGE_TAG 750106130512.dkr.ecr.us-east-1.amazonaws.com/$REPOSITORY:$IMAGE_TAG
-        docker push 750106130512.dkr.ecr.us-east-1.amazonaws.com/$REPOSITORY:$IMAGE_TAG
+        docker tag $REPOSITORY:$IMAGE_TAG $REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+        docker push $REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG

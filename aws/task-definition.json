@@ -1,0 +1,63 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:750106130512:task-definition/github-check-td:1",
+    "containerDefinitions": [
+        {
+            "name": "github-check-container",
+            "image": "750106130512.dkr.ecr.us-east-1.amazonaws.com/github-check:68f93ffddf42c75f9c828994cf6047dc088da242",
+            "cpu": 0,
+            "memoryReservation": 128,
+            "portMappings": [],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "host",
+                    "value": "65.108.144.228"
+                },
+                {
+                    "name": "database",
+                    "value": "job_scraper"
+                },
+                {
+                    "name": "passwd",
+                    "value": "Crawler#@(*)2022%"
+                },
+                {
+                    "name": "user",
+                    "value": "hccrawler"
+                },
+                {
+                    "name": "auth_plugin",
+                    "value": "mysql_native_password"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": []
+        }
+    ],
+    "family": "github-check-td",
+    "executionRoleArn": "arn:aws:iam::750106130512:role/ecsTaskExecutionRole",
+    "revision": 1,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EXTERNAL",
+        "EC2"
+    ],
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "registeredAt": 1659541373.291,
+    "registeredBy": "arn:aws:iam::750106130512:root"
+}

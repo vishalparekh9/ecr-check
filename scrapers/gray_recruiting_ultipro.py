@@ -1,0 +1,98 @@
+import json
+from copy import deepcopy
+import time
+import requests
+from bs4 import BeautifulSoup
+from index import get_obj
+
+specialid = 'GRA1016GRYC'
+id = '5f2c7915-b97e-4123-bbdc-2a7b42446960'
+token = 'RECRUITING_ULTIPRO_GRAY_JOBS'
+
+
+class CRAWLER(object):
+    def __init__(self):
+        self.baseUrl = f'https://recruiting.ultipro.com/{specialid}/JobBoard/{id}/JobBoardView/LoadSearchResults'
+
+        self.getHeaders = {
+            'Connection': 'keep-alive',
+            'Cache-Control': 'max-age=0',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent':
+                'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36',
+            'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+        }
+        self.session = requests.session()
+        self.domain = 'gray.com'
+        self.obj = deepcopy(get_obj())
+        self.allJobs = []
+        self.iserror = False
+
+    def get_request(self, url):
+        try:
+            res = self.session.get(url, headers=self.getHeaders)
+            return True, res
+        except Exception as e:
+            print(e)
+        return False, False
+
+    def process_logic(self):
+        try:
+            url = f'https://recruiting.ultipro.com/{specialid}/JobBoard/{id}/JobBoardView/LoadSearchResults?Skip=0&Top=50'
+
+            isloaded, res = self.get_request(url)
+            if isloaded:
+                links = res.json()['totalCount']
+                if int(links) > 0:
+
+                    url = f'https://recruiting.ultipro.com/{specialid}/JobBoard/{id}/JobBoardView/LoadSearchResults?Skip=0&Top={links}'
+
+                    isloaded, res = self.get_request(url)
+                    if isloaded:
+                        links = res.json()['opportunities']
+                        if len(links) > 0:
+                            for link in links:
+                                jobObj = deepcopy(self.obj)
+                                url = f'https://recruiting.ultipro.com/{specialid}/JobBoard/{id}/OpportunityDetail?opportunityId={link["Id"]}'
+                                jobObj['url'] = url
+                                time.sleep(5)
+
+                                isloaded, jobres = self.get_request(url)
+
+                                if jobres.text is not None:
+                                    jobDetail = BeautifulSoup(jobres.text, 'lxml')
+                                    if isloaded:
+                                        jobObj['title'] = link['Title']
+                                        jobObj['location'] = link['Locations'][0]['Address']['City'] + ', ' + link['Locations'][0]['Address']['State']['Code']
+
+                                        descs = jobDetail.find_all('script')
+                                        for desc in descs:
+                                            try:
+                                                if 'CandidateOpportunityDetail' in desc.text:
+                                                    des = desc.text.split('CandidateOpportunityDetail(')[1]
+                                                    des = des.split(');')[0]
+                                                    jsn = json.loads(des)
+                                                    jobObj['description'] = str(jsn['Description'])
+                                            except (Exception, AttributeError, KeyError, ValueError) as e:
+                                                pass
+
+                                        if jobObj['title'] != '' and jobObj['url'] != '':
+                                            self.allJobs.append(jobObj)
+                                            print(jobObj)
+                                    else:
+                                        print('No Job Data Found!')
+                                        isdata = False
+                                else:
+                                    print("desc not found")
+            else:
+                isdata = False
+        except Exception as e:
+            print(e)
+            self.iserror = True
+
+
+if __name__ == "__main__":
+    scraper = CRAWLER()
+    scraper.process_logic()
+    print(len(scraper.allJobs))

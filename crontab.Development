@@ -1,0 +1,4 @@
+*/1 * * * * python /usr/src/app/handler2.py 
+*/1 * * * * python /usr/src/app/runner/runner.py    
+*/15 * * * * python /usr/src/app/runner/update_cat.py 
+43 11 * * *python /usr/src/app/runner/delete_jobs.py 

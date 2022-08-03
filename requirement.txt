@@ -1,0 +1,12 @@
+lxml==4.7.1
+requests==2.27.1
+requests-file==1.5.1
+requests-toolbelt==0.9.1
+requests-unixsocket==0.2.0
+redis==4.1.4
+regex==2022.4.24
+mysql-connector==2.2.9
+celery==5.2.3
+urllib3==1.26.8
+bs4==0.0.1
+python-dotenv

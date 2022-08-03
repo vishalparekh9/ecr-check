@@ -6,6 +6,9 @@ on:
 env:
   AWS_REGION: us-east-1
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     name: Deploy
